@@ -33,27 +33,26 @@ uvx --from . image-vision-server   # 等价于 uv run server.py
 
 ## 配置（敏感信息注入）
 
-API Key 不写入任何配置文件——设置到系统/用户环境变量中，MCP 子进程会自动继承父进程的环境：
+API Key 先设置到系统环境变量，注册时通过 `--env` 参数显式声明注入点；配置文件里只存 `${VAR}` 引用，Claude Code 在连接建立时才展开为真实值——密钥全程不以明文落盘：
 
 ```bash
-# Windows（用户级，新开的终端生效）
+# 1. 设置环境变量（Windows 用户级 / POSIX shell profile）
 setx DASHSCOPE_API_KEY "sk-xxxxxxxxxxxxxxxx"
+export DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxxxxx     # macOS / Linux
 
-# macOS / Linux（写入 ~/.bashrc 或 ~/.zshrc）
-export DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxxxxx
+# 2. 注册（${VAR} 用单引号包住，防止 shell 当场展开）
+claude mcp add --scope user image-vision \
+  --env 'DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}' \
+  -- uvx --from git+https://github.com/fenlyin0420/image-vision-server.git image-vision-server
 ```
 
-可选：切换视觉模型（默认 `qwen3.7-flash`）：
+连接时也可以直接给明文值（`--env DASHSCOPE_API_KEY=sk-xxx`），机制上等效，但密钥会明文留在配置文件里，不推荐。未在 `env` 块声明的变量仍按进程环境正常继承。
+
+可选：切换视觉模型（默认 `qwen3.7-flash`），同样走环境变量或 `--env`：
 
 ```bash
-setx VISION_MODEL "qwen-vl-max"    # Windows
-export VISION_MODEL=qwen-vl-max    # macOS / Linux
-```
-
-如需在 MCP 配置里显式声明而非依赖继承，可用 `${VAR}` 展开语法引用环境变量（不要写明文密钥）：
-
-```json
-{ "command": "uvx", "args": ["..."], "env": { "DASHSCOPE_API_KEY": "${DASHSCOPE_API_KEY}" } }
+setx VISION_MODEL "qwen-vl-max"     # Windows
+export VISION_MODEL=qwen-vl-max     # macOS / Linux
 ```
 
 ## 使用
