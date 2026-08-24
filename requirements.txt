@@ -1,2 +1,4 @@
-mcp>=1.0.0
+# 注意:mcp 2.x 移除了 Server.list_tools/call_tool 装饰器(本 server 使用的 API),
+# 故钉在 <2.0.0。
+mcp>=1.0.0,<2.0.0
 httpx>=0.27.0
