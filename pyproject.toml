@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-vision-server"
+version = "0.1.0"
+description = "MCP server: 通过百炼(DashScope)视觉模型为不支持多模态的主模型提供识图能力"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0,<2.0.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+image-vision-server = "server:run"
+
+[tool.setuptools]
+py-modules = ["server"]

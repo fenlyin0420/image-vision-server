@@ -9,6 +9,9 @@ MCP Server: 图片识别服务
   1. 将图片保存到本地文件
   2. 对话中告诉 Claude: "帮我分析 D:/screenshots/error.png"
   3. DeepSeek 调用本工具 -> 百炼识图 -> 返回文字
+
+启动 (uvx, 需 DASHSCOPE_API_KEY 已注入环境变量):
+  uvx --from git+https://github.com/fenlyin0420/image-vision-server.git image-vision-server
 """
 
 import base64
@@ -185,6 +188,12 @@ async def main():
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-if __name__ == "__main__":
+def run():
+    """同步控制台入口，供 [project.scripts] 在 uvx/pip 安装后调用。"""
     import asyncio
+
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    run()
